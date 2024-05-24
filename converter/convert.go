@@ -45,3 +45,16 @@ func ConvertFileToText(filename, aes_key string) ([]string, error) {
 
 	return out, nil
 }
+
+func ConvertTextToFile(filename, aes_key string, text []string) {
+	unsplited := ""
+
+	for i := 0; i < len(text); i++ {
+		unsplited += text[i]
+	}
+
+	dat, _ := base64.StdEncoding.DecodeString(unsplited)
+	key := hashing.Sha256_to_bytes([]byte(aes_key))
+	real_dat, _ := aes.AesGCMDecrypt(key, dat)
+	os.WriteFile(filename, real_dat, 0644)
+}
