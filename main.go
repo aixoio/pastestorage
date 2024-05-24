@@ -15,6 +15,7 @@ func main() {
 
 	if strings.Compare(strings.ToLower(os.Args[1]), "license") == 0 {
 		ShowFullLicense()
+		return
 	}
 
 }
