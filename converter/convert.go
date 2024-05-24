@@ -5,17 +5,23 @@ import (
 	"math"
 	"os"
 	"sync"
+
+	"github.com/aixoio/pastestorage/aes"
+	"github.com/aixoio/pastestorage/hashing"
 )
 
 const KB_PER_SPLIT_IN_BYTES = 512000
 
-func ConvertFileToText(filename string) ([]string, error) {
+func ConvertFileToText(filename, aes_key string) ([]string, error) {
 	file_dat, err := os.ReadFile(filename)
 	if err != nil {
 		return []string{}, err
 	}
 
-	unsplited := base64.StdEncoding.EncodeToString(file_dat)
+	key := hashing.Sha256_to_bytes([]byte(aes_key))
+	dat, _ := aes.AesGCMEncrypt(key, file_dat)
+
+	unsplited := base64.StdEncoding.EncodeToString(dat)
 
 	split_count := int(math.Ceil(float64(len(unsplited)) / float64(KB_PER_SPLIT_IN_BYTES)))
 	out := make([]string, split_count)

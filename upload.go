@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +11,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/aixoio/pastestorage/aes"
 	"github.com/aixoio/pastestorage/converter"
+	"github.com/aixoio/pastestorage/hashing"
 )
 
 type links_list struct {
@@ -23,8 +26,8 @@ type final_dat struct {
 	Links    []links_list
 }
 
-func UploadFile(filename, api_key, username, password string) {
-	pastes, err := converter.ConvertFileToText(filename)
+func UploadFile(filename, api_key, username, password, aes_key string) {
+	pastes, err := converter.ConvertFileToText(filename, aes_key)
 	if err != nil {
 		panic(err)
 	}
@@ -57,10 +60,13 @@ func UploadFile(filename, api_key, username, password string) {
 
 	json, _ := json.Marshal(last_paste)
 
-	link, _ := postPaste(string(json), api_key, user_key)
+	key := hashing.Sha256_to_bytes([]byte(aes_key))
+	enc, _ := aes.AesGCMEncrypt(key, json)
+	dat := base64.StdEncoding.EncodeToString(enc)
 
-	fmt.Println(link)
+	link, _ := postPaste(dat, api_key, user_key)
 
+	fmt.Println("Your file was uploaded to", link)
 }
 
 func loginPost(username, password, api_key string) (string, error) {
