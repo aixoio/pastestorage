@@ -1,5 +1,11 @@
 package main
 
-func UploadFile(filename string) {
+import (
+	"fmt"
 
+	"github.com/aixoio/pastestorage/converter"
+)
+
+func UploadFile(filename string) {
+	fmt.Println(converter.ConvertFileToText(filename))
 }
