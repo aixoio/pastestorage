@@ -19,11 +19,11 @@ func main() {
 	}
 
 	if strings.Compare(strings.ToLower(os.Args[1]), "upload") == 0 {
-		if len(os.Args) < 3 {
-			fmt.Println("Usage: pastestorage upload <FILENAME>")
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: pastestorage upload <FILENAME> <API_KEY>")
 			os.Exit(1)
 		}
-		UploadFile(os.Args[2])
+		UploadFile(os.Args[2], os.Args[3])
 		return
 	}
 
