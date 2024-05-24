@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,6 +13,16 @@ import (
 	"github.com/aixoio/pastestorage/converter"
 )
 
+type links_list struct {
+	Index int
+	Link  string
+}
+
+type final_dat struct {
+	Filename string
+	Links    []links_list
+}
+
 func UploadFile(filename, api_key, username, password string) {
 	pastes, err := converter.ConvertFileToText(filename)
 	if err != nil {
@@ -19,16 +31,36 @@ func UploadFile(filename, api_key, username, password string) {
 
 	var wg sync.WaitGroup
 	user_key, _ := loginPost(username, password, api_key)
+	links := []links_list{}
+	var links_mutex sync.Mutex
 
-	for _, paste := range pastes {
+	for i, paste := range pastes {
 		wg.Add(1)
-		go func(paste string) {
-			postPaste(paste, api_key, user_key)
+		go func(paste string, i int) {
+			link, _ := postPaste(paste, api_key, user_key)
+			links_mutex.Lock()
+			links = append(links, links_list{
+				Index: i,
+				Link:  link,
+			})
+			links_mutex.Unlock()
 			wg.Done()
-		}(paste)
+		}(paste, i)
 	}
 
 	wg.Wait()
+
+	last_paste := final_dat{
+		Links:    links,
+		Filename: filename,
+	}
+
+	json, _ := json.Marshal(last_paste)
+
+	link, _ := postPaste(string(json), api_key, user_key)
+
+	fmt.Println(link)
+
 }
 
 func loginPost(username, password, api_key string) (string, error) {
