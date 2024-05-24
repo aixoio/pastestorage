@@ -13,6 +13,5 @@ func ShowLicenseMessage() {
 }
 
 func ShowFullLicense() {
-	ShowLicenseMessage()
 	fmt.Println(full_license)
 }
