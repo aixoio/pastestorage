@@ -5,5 +5,9 @@ import (
 )
 
 func UploadFile(filename string, api_key string) {
-	converter.ConvertFileToText(filename)
+	pastes, err := converter.ConvertFileToText(filename)
+	if err != nil {
+		panic(err)
+	}
+
 }
