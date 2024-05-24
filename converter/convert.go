@@ -7,13 +7,13 @@ import (
 
 const KB_PER_SPLIT_IN_BYTES = 512000
 
-func ConvertFileToText(filename string) (string, error) {
+func ConvertFileToText(filename string) ([]string, error) {
 	file_dat, err := os.ReadFile(filename)
 	if err != nil {
-		return "", err
+		return []string{}, err
 	}
 
 	unsplited := base64.StdEncoding.EncodeToString(file_dat)
 
-	return "", nil
+	return []string{}, nil
 }
