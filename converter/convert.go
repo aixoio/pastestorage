@@ -1,6 +1,9 @@
 package converter
 
-import "os"
+import (
+	"encoding/base64"
+	"os"
+)
 
 const KB_PER_SPLIT_IN_BYTES = 512000
 
@@ -9,6 +12,8 @@ func ConvertFileToText(filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	unsplited := base64.StdEncoding.EncodeToString(file_dat)
 
 	return "", nil
 }
